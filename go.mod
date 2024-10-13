@@ -1,4 +1,4 @@
-module github.com/Roshick/caddy-module-github-webhook
+module github.com/Roshick/caddy-module-github-webhook-validation-payload
 
 go 1.23
 
