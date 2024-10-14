@@ -3,7 +3,7 @@ package caddy_module_github_webhook
 import (
 	"crypto/hmac"
 	"crypto/sha256"
-	"crypto/subtle"
+	"encoding/hex"
 	"fmt"
 	"github.com/caddyserver/caddy/v2"
 	"github.com/caddyserver/caddy/v2/caddyconfig/caddyfile"
@@ -55,10 +55,9 @@ func (m Middleware) ServeHTTP(w http.ResponseWriter, r *http.Request, next caddy
 
 	mac := hmac.New(sha256.New, []byte(m.Secret))
 	mac.Write(payloadBytes)
-	expected := mac.Sum(nil)
+	expected := []byte(hex.EncodeToString(mac.Sum(nil)))
 
-	valid := subtle.ConstantTimeCompare(expected, actual)
-	if valid == 0 {
+	if !hmac.Equal(actual, expected) {
 		// unauthorized in case of invalid signature
 		w.WriteHeader(401)
 		_, err = w.Write(nil)
