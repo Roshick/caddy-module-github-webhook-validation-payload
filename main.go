@@ -1,6 +1,7 @@
 package caddy_module_github_webhook
 
 import (
+	"bytes"
 	"crypto/hmac"
 	"crypto/sha256"
 	"encoding/hex"
@@ -43,24 +44,19 @@ func (m *Middleware) Validate() error {
 
 // ServeHTTP implements caddyhttp.MiddlewareHandler.
 func (m Middleware) ServeHTTP(w http.ResponseWriter, r *http.Request, next caddyhttp.Handler) error {
-	payloadBytes, err := io.ReadAll(r.Body)
-	if err != nil {
-		// bad request in case of payload error
-		w.WriteHeader(400)
-		_, err = w.Write(nil)
-		return err
-	}
+	var buffer bytes.Buffer
+	r.Body = io.NopCloser(io.TeeReader(r.Body, &buffer))
 
 	actual := []byte(strings.TrimPrefix(r.Header.Get("X-Hub-Signature-256"), "sha256="))
 
 	mac := hmac.New(sha256.New, []byte(m.Secret))
-	mac.Write(payloadBytes)
+	mac.Write(buffer.Bytes())
 	expected := []byte(hex.EncodeToString(mac.Sum(nil)))
 
 	if !hmac.Equal(actual, expected) {
 		// unauthorized in case of invalid signature
 		w.WriteHeader(401)
-		_, err = w.Write(nil)
+		_, err := w.Write(nil)
 		return err
 	}
 
