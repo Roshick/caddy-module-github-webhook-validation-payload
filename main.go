@@ -46,17 +46,25 @@ func (m *Middleware) Validate() error {
 func (m Middleware) ServeHTTP(w http.ResponseWriter, r *http.Request, next caddyhttp.Handler) error {
 	var buffer bytes.Buffer
 	r.Body = io.NopCloser(io.TeeReader(r.Body, &buffer))
+	payloadBytes, err := io.ReadAll(r.Body)
+	if err != nil {
+		// bad request in case of payload error
+		w.WriteHeader(400)
+		_, err = w.Write(nil)
+		return err
+	}
+	r.Body = io.NopCloser(&buffer)
 
 	actual := []byte(strings.TrimPrefix(r.Header.Get("X-Hub-Signature-256"), "sha256="))
 
 	mac := hmac.New(sha256.New, []byte(m.Secret))
-	mac.Write(buffer.Bytes())
+	mac.Write(payloadBytes)
 	expected := []byte(hex.EncodeToString(mac.Sum(nil)))
 
 	if !hmac.Equal(actual, expected) {
 		// unauthorized in case of invalid signature
 		w.WriteHeader(401)
-		_, err := w.Write(nil)
+		_, err = w.Write(nil)
 		return err
 	}
 
