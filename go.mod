@@ -2,7 +2,7 @@ module github.com/Roshick/caddy-module-github-webhook-validation-payload
 
 go 1.22.3
 
-toolchain go1.23.4
+toolchain go1.23.5
 
 require github.com/caddyserver/caddy/v2 v2.9.1
 
