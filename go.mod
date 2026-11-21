@@ -2,7 +2,7 @@ module github.com/Roshick/caddy-module-github-webhook-validation-payload
 
 go 1.26.0
 
-require github.com/caddyserver/caddy/v2 v2.11.8
+require github.com/caddyserver/caddy/v2 v2.11.9
 
 require (
 	cel.dev/cel-go v0.32.0 // indirect
@@ -44,7 +44,7 @@ require (
 	github.com/felixge/httpsnoop v1.1.0 // indirect
 	github.com/francoispqt/gojay v1.2.13 // indirect
 	github.com/go-jose/go-jose/v3 v3.0.5 // indirect
-	github.com/go-jose/go-jose/v4 v4.1.5 // indirect
+	github.com/go-jose/go-jose/v4 v4.1.6 // indirect
 	github.com/go-kit/kit v0.13.0 // indirect
 	github.com/go-kit/log v0.2.1 // indirect
 	github.com/go-logfmt/logfmt v0.6.0 // indirect
